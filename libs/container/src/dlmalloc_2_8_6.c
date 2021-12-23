@@ -577,6 +577,16 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #endif  /* HAVE_MORECORE */
 #endif  /* DARWIN */
 
+#ifdef __vita__
+#define HAVE_MMAP 0
+#define HAVE_MORECORE 0
+#define LACKS_SYS_MMAN_H
+#ifndef MALLOC_FAILURE_ACTION
+#define MALLOC_FAILURE_ACTION
+#endif /* MALLOC_FAILURE_ACTION */
+#endif  /* __vita__ */
+
+
 #ifndef LACKS_SYS_TYPES_H
 #include <sys/types.h>  /* For size_t */
 #endif  /* LACKS_SYS_TYPES_H */

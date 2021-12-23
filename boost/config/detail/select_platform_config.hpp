@@ -93,6 +93,10 @@
 // Web assembly:
 #  define BOOST_PLATFORM_CONFIG "boost/config/platform/wasm.hpp"
 
+#elif defined (__vita__)
+// PSVita:
+#  define BOOST_PLATFORM_CONFIG "boost/config/platform/vita.hpp"
+
 #else
 
 #  if defined(unix) \

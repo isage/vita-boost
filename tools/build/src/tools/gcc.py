@@ -718,7 +718,7 @@ elif bjam.variable('UNIX'):
         pass
     else:
         flags('gcc', 'OPTIONS', ['<threading>multi'], ['-pthread'])
-        flags('gcc', 'FINDLIBS-SA', [], ['rt'])
+#        flags('gcc', 'FINDLIBS-SA', [], ['rt'])
 
 def cpu_flags(toolset, variable, architecture, instruction_set, values, default=None):
     #FIXME: for some reason this fails.  Probably out of date feature code

@@ -38,6 +38,14 @@
 #endif
 #include <cerrno>
 
+#ifdef __vita__
+#include <psp2/io/fcntl.h>
+#include <psp2/io/stat.h>
+#include <psp2/io/dirent.h>
+#include <psp2/io/devctl.h>
+#include <psp2/rtc.h>
+#endif
+
 #ifdef BOOST_POSIX_API
 
 #include <sys/types.h>
@@ -45,6 +53,7 @@
 
 #if defined(__wasm)
 // WASI does not have statfs or statvfs.
+#elif defined(__vita__)
 #elif !defined(__APPLE__) && \
     (!defined(__OpenBSD__) || BOOST_OS_BSD_OPEN >= BOOST_VERSION_NUMBER(4, 4, 0)) && \
     !defined(__ANDROID__) && \
@@ -2940,6 +2949,29 @@ void last_write_time(path const& p, const std::time_t new_time, system::error_co
 
 #if defined(BOOST_POSIX_API)
 
+#if defined(__vita__)
+    char *real = ::realpath(p.c_str(), NULL);
+    SceUID fd = ::sceIoOpen(real, SCE_O_RDONLY, 0666);
+    if (BOOST_UNLIKELY(fd < 0))
+    {
+        free(real);
+        emit_error(BOOST_ERRNO, p, ec, "boost::filesystem::last_write_time");
+        return;
+    }
+    free(real);
+
+    struct SceIoStat st = {0};
+    sceRtcSetTime_t(&st.st_mtime, new_time);
+    int ret = ::sceIoChstatByFd(fd, &st,  SCE_CST_MT);
+    ::sceIoClose(fd);
+    if (BOOST_UNLIKELY(ret < 0))
+    {
+        emit_error(BOOST_ERRNO, p, ec, "boost::filesystem::last_write_time");
+        return;
+    }
+    return;
+#else
+
 #if _POSIX_C_SOURCE >= 200809L
 
     struct timespec times[2] = {};
@@ -2971,7 +3003,7 @@ void last_write_time(path const& p, const std::time_t new_time, system::error_co
         emit_error(BOOST_ERRNO, p, ec, "boost::filesystem::last_write_time");
 
 #endif // _POSIX_C_SOURCE >= 200809L
-
+#endif
 #else // defined(BOOST_POSIX_API)
 
     handle_wrapper hw(
@@ -3263,6 +3295,19 @@ space_info space(path const& p, error_code* ec)
 
     emit_error(BOOST_ERROR_NOT_SUPPORTED, p, ec, "boost::filesystem::space");
 
+#elif defined(__vita__)
+
+    SceIoDevInfo devinfo;
+    memset(&devinfo, 0, sizeof(SceIoDevInfo));
+    int res = sceIoDevctl(p.c_str(), 0x3001, NULL, 0, &devinfo, sizeof(SceIoDevInfo));
+
+    if (!error(res < 0 ? BOOST_ERRNO : 0,
+      p, ec, "boost::filesystem::space"))
+    {
+      info.capacity = static_cast<boost::uintmax_t>(devinfo.max_size);
+      info.free = static_cast<boost::uintmax_t>(devinfo.free_size);
+      info.available = static_cast<boost::uintmax_t>(devinfo.max_size - devinfo.free_size);
+    }
 #elif defined(BOOST_POSIX_API)
 
     struct BOOST_STATVFS vfs;
