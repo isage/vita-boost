@@ -220,7 +220,7 @@ error_code dir_itr_first(void*& handle, void*& buffer, const char* dir, std::str
 // *result set to NULL on end of directory
 inline int readdir_r_simulator(DIR* dirp, void*& buffer, struct dirent** result)
 {
-#if defined(BOOST_FILESYSTEM_USE_READDIR_R)
+#if defined(BOOST_FILESYSTEM_USE_READDIR_R) && !defined(__vita__)
     errno = 0;
 
     if (::sysconf(_SC_THREAD_SAFE_FUNCTIONS) >= 0)

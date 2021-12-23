@@ -2400,12 +2400,16 @@ void create_directory_symlink(path const& to, path const& from, system::error_co
         ec->clear();
 
 #if defined(BOOST_POSIX_API)
+#if defined(__vita__)
+    emit_error(ENOSYS, to, from, ec, "boost::filesystem::create_directory_symlink");
+#else
     int err = ::symlink(to.c_str(), from.c_str());
     if (BOOST_UNLIKELY(err < 0))
     {
         err = errno;
         emit_error(err, to, from, ec, "boost::filesystem::create_directory_symlink");
     }
+#endif
 #else
     // see if actually supported by Windows runtime dll
     if (!create_symbolic_link_api)
@@ -2429,8 +2433,11 @@ void create_hard_link(path const& to, path const& from, error_code* ec)
     if (error(!create_hard_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec, "boost::filesystem::create_hard_link"))
         return;
 #endif
-
+#if defined(__vita__)
+    emit_error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec, "boost::filesystem::create_hard_link");
+#else
     error(!BOOST_CREATE_HARD_LINK(from.c_str(), to.c_str()) ? BOOST_ERRNO : 0, to, from, ec, "boost::filesystem::create_hard_link");
+#endif
 }
 
 BOOST_FILESYSTEM_DECL
@@ -2440,12 +2447,16 @@ void create_symlink(path const& to, path const& from, error_code* ec)
         ec->clear();
 
 #if defined(BOOST_POSIX_API)
+#if defined(__vita__)
+    emit_error(ENOSYS, to, from, ec, "boost::filesystem::create_symlink");
+#else
     int err = ::symlink(to.c_str(), from.c_str());
     if (BOOST_UNLIKELY(err < 0))
     {
         err = errno;
         emit_error(err, to, from, ec, "boost::filesystem::create_symlink");
     }
+#endif
 #else
     // see if actually supported by Windows runtime dll
     if (!create_symbolic_link_api)
@@ -3076,7 +3087,8 @@ void permissions(path const& p, perms prms, system::error_code* ec)
     !(defined(linux) || defined(__linux) || defined(__linux__)) && \
     !(defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < 101000) && \
     !(defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED < 80000) && \
-    !(defined(__QNX__) && (_NTO_VERSION <= 700))
+    !(defined(__QNX__) && (_NTO_VERSION <= 700)) && \
+    !(defined(__vita__))
     if (::fchmodat(AT_FDCWD, p.c_str(), mode_cast(prms), !(prms & symlink_perms) ? 0 : AT_SYMLINK_NOFOLLOW))
 #else // fallback if fchmodat() not supported
     if (::chmod(p.c_str(), mode_cast(prms)))
@@ -3122,6 +3134,11 @@ path read_symlink(path const& p, system::error_code* ec)
     path symlink_path;
 
 #ifdef BOOST_POSIX_API
+#ifdef __vita__
+        const int err = EINVAL;
+        BOOST_FILESYSTEM_THROW(filesystem_error("boost::filesystem::read_symlink", p, error_code(err, system_category())));
+        ec->assign(err, system_category());
+#else
     const char* const path_str = p.c_str();
     char small_buf[small_path_size];
     ssize_t result = ::readlink(path_str, small_buf, sizeof(small_buf));
@@ -3168,7 +3185,7 @@ path read_symlink(path const& p, system::error_code* ec)
             }
         }
     }
-
+#endif
 #else
 
     handle_wrapper h(
