@@ -15,6 +15,10 @@
 
 // boilerplate code:
 #define BOOST_HAS_UNISTD_H
+#define BOOST_HAS_GETTIMEOFDAY
+#define BOOST_LOG_NO_ASIO
+#define BOOST_LOG_WITHOUT_SYSLOG
+#define BOOST_LOG_WITHOUT_IPC
 #include <boost/config/detail/posix_features.hpp>
 
 

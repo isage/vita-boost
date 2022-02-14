@@ -387,7 +387,7 @@ local rule compile-link-flags ( * )
 
     threading-flags <target-os>windows : -mthreads ;
     threading-flags <target-os>cygwin  : -mthreads ;
-    threading-flags <target-os>solaris  : -pthreads ;
+    threading-flags <target-os>solaris  : -pthreads : rt ;
     threading-flags <target-os>qnx : -pthread ;
 
     local bsd = [ MATCH ^(.*bsd)$ : $(all-os) ] ;
