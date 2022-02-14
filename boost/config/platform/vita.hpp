@@ -19,6 +19,9 @@
 #define BOOST_LOG_NO_ASIO
 #define BOOST_LOG_WITHOUT_SYSLOG
 #define BOOST_LOG_WITHOUT_IPC
+#define BOOST_LOG_NO_GETPWUID_R
+#define BOOST_LOG_NO_GETPGRP
+#define BOOST_LOG_NO_GETSID
 #include <boost/config/detail/posix_features.hpp>
 
 
