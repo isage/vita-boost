@@ -119,6 +119,10 @@
 #      define BOOST_ASIO_HAS_MOVE 1
 #    endif // defined(__ICL) && (__ICL >= 1500)
 #  endif // defined(__INTEL_CXX11_MODE__)
+#  if defined(__vita__)
+#   define BOOST_ASIO_HAS_MOVE 1
+#  endif // defined(__vita__)
+
 # endif // !defined(BOOST_ASIO_DISABLE_MOVE)
 #endif // !defined(BOOST_ASIO_HAS_MOVE)
 
@@ -184,6 +188,9 @@
 #    define BOOST_ASIO_HAS_VARIADIC_TEMPLATES 1
 #   endif // (_MSC_VER >= 1900)
 #  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(__vita__)
+#    define BOOST_ASIO_HAS_VARIADIC_TEMPLATES 1
+#  endif
 # endif // !defined(BOOST_ASIO_DISABLE_VARIADIC_TEMPLATES)
 #endif // !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 #if !defined(BOOST_ASIO_ELLIPSIS)
@@ -212,6 +219,9 @@
 #   define BOOST_ASIO_DELETED = delete
 #  endif // (_MSC_VER >= 1900)
 # endif // defined(BOOST_ASIO_MSVC)
+# if defined(__vita__)
+#  define BOOST_ASIO_DELETED = delete
+# endif // defined(__vita__)
 # if !defined(BOOST_ASIO_DELETED)
 #  define BOOST_ASIO_DELETED
 # endif // !defined(BOOST_ASIO_DELETED)
@@ -236,6 +246,9 @@
 #    define BOOST_ASIO_HAS_CONSTEXPR 1
 #   endif // (_MSC_VER >= 1900)
 #  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(__vita__)
+#   define BOOST_ASIO_HAS_CONSTEXPR 1
+#  endif // defined(__vita__)
 # endif // !defined(BOOST_ASIO_DISABLE_CONSTEXPR)
 #endif // !defined(BOOST_ASIO_HAS_CONSTEXPR)
 #if !defined(BOOST_ASIO_CONSTEXPR)
@@ -302,6 +315,10 @@
 #    define BOOST_ASIO_HAS_NOEXCEPT 1
 #   endif // (_MSC_VER >= 1900)
 #  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(__vita__)
+#   define BOOST_ASIO_NOEXCEPT noexcept(true)
+#   define BOOST_ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#  endif // defined(__vita__)
 # endif // !defined(BOOST_ASIO_DISABLE_NOEXCEPT)
 # if !defined(BOOST_ASIO_NOEXCEPT)
 # endif // !defined(BOOST_ASIO_NOEXCEPT)
@@ -368,6 +385,9 @@
 #    define BOOST_ASIO_HAS_DECLTYPE 1
 #   endif // (_MSC_VER >= 1800)
 #  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(__vita__)
+#   define BOOST_ASIO_HAS_DECLTYPE 1
+#  endif // defined(__vita__)
 # endif // !defined(BOOST_ASIO_DISABLE_DECLTYPE)
 #endif // !defined(BOOST_ASIO_HAS_DECLTYPE)
 
@@ -1440,7 +1460,8 @@
    || defined(__NetBSD__) \
    || defined(__OpenBSD__) \
    || defined(__linux__) \
-   || defined(__HAIKU__)
+   || defined(__HAIKU__) \
+   || defined(__vita__)
 #   define BOOST_ASIO_HAS_UNISTD_H 1
 #  endif
 # endif // !defined(BOOST_ASIO_HAS_BOOST_CONFIG)
@@ -1511,7 +1532,8 @@
 # if defined(BOOST_ASIO_HAS_IOCP) \
   || !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 #  if !defined(__SYMBIAN32__)
 #   if !defined(BOOST_ASIO_DISABLE_SERIAL_PORT)
 #    define BOOST_ASIO_HAS_SERIAL_PORT 1
@@ -1566,7 +1588,8 @@
 # if !defined(BOOST_ASIO_DISABLE_POSIX_STREAM_DESCRIPTOR)
 #  if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 #   define BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR 1
 #  endif // !defined(BOOST_ASIO_WINDOWS)
          //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
@@ -1599,7 +1622,8 @@
 # if defined(BOOST_ASIO_HAS_IOCP) \
   || !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 #  if !defined(__SYMBIAN32__)
 #   if !defined(BOOST_ASIO_DISABLE_PIPE)
 #    define BOOST_ASIO_HAS_PIPE 1
@@ -1616,7 +1640,8 @@
 # if !defined(BOOST_ASIO_DISABLE_SIGACTION)
 #  if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 #   define BOOST_ASIO_HAS_SIGACTION 1
 #  endif // !defined(BOOST_ASIO_WINDOWS)
          //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
@@ -1627,9 +1652,9 @@
 // Can use signal().
 #if !defined(BOOST_ASIO_HAS_SIGNAL)
 # if !defined(BOOST_ASIO_DISABLE_SIGNAL)
-#  if !defined(UNDER_CE)
+#  if !defined(UNDER_CE) && !defined(__vita__)
 #   define BOOST_ASIO_HAS_SIGNAL 1
-#  endif // !defined(UNDER_CE)
+#  endif // !defined(UNDER_CE) && !defined(__vita__)
 # endif // !defined(BOOST_ASIO_DISABLE_SIGNAL)
 #endif // !defined(BOOST_ASIO_HAS_SIGNAL)
 
@@ -1650,6 +1675,7 @@
 #   else // defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
 #    define BOOST_ASIO_HAS_GETADDRINFO 1
 #   endif // defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+#  elif defined(__vita__)
 #  else // defined(__MACH__) && defined(__APPLE__)
 #   define BOOST_ASIO_HAS_GETADDRINFO 1
 #  endif // defined(__MACH__) && defined(__APPLE__)
@@ -1842,7 +1868,8 @@
 // Support for POSIX ssize_t typedef.
 #if !defined(BOOST_ASIO_DISABLE_SSIZE_T)
 # if defined(__linux__) \
-   || (defined(__MACH__) && defined(__APPLE__))
+   || (defined(__MACH__) && defined(__APPLE__)) \
+   || defined(__vita__)
 #  define BOOST_ASIO_HAS_SSIZE_T 1
 # endif // defined(__linux__)
         //   || (defined(__MACH__) && defined(__APPLE__))

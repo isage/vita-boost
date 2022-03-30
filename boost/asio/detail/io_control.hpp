@@ -45,7 +45,11 @@ public:
   // Get the name of the IO control command.
   int name() const
   {
+#if defined(__vita__)
+    return 0;
+#else
     return static_cast<int>(BOOST_ASIO_OS_DEF(FIONREAD));
+#endif
   }
 
   // Set the value of the I/O control command.

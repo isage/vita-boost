@@ -68,7 +68,8 @@ void boost_asio_signal_handler(int signal_number)
 {
 #if defined(BOOST_ASIO_WINDOWS) \
   || defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  || defined(__CYGWIN__)
+  || defined(__CYGWIN__) \
+  || defined(__vita__)
   signal_set_service::deliver_signal(signal_number);
 #else // defined(BOOST_ASIO_WINDOWS)
       //   || defined(BOOST_ASIO_WINDOWS_RUNTIME)
@@ -90,7 +91,8 @@ void boost_asio_signal_handler(int signal_number)
 
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 class signal_set_service::pipe_read_op :
 # if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   public io_uring_operation
@@ -164,7 +166,8 @@ signal_set_service::signal_set_service(execution_context& context)
     scheduler_(boost::asio::use_service<scheduler_impl>(context)),
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 # if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
     io_uring_service_(boost::asio::use_service<io_uring_service>(context)),
 # else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
@@ -180,7 +183,8 @@ signal_set_service::signal_set_service(execution_context& context)
 
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
 # if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
   io_uring_service_.init_task();
 # else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
@@ -224,7 +228,8 @@ void signal_set_service::notify_fork(execution_context::fork_event fork_ev)
 {
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
   signal_state* state = get_signal_state();
   static_mutex::scoped_lock lock(state->mutex_);
 
@@ -349,7 +354,7 @@ boost::system::error_code signal_set_service::add(
       if (::signal(signal_number, boost_asio_signal_handler) == SIG_ERR)
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
-# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__) || defined(__vita__)
         ec = boost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = boost::system::error_code(errno,
@@ -419,7 +424,7 @@ boost::system::error_code signal_set_service::remove(
       if (::signal(signal_number, SIG_DFL) == SIG_ERR)
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
-# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__) || defined(__vita__)
         ec = boost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = boost::system::error_code(errno,
@@ -473,7 +478,7 @@ boost::system::error_code signal_set_service::clear(
       if (::signal(reg->signal_number_, SIG_DFL) == SIG_ERR)
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
-# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+# if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__) || defined(__vita__)
         ec = boost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = boost::system::error_code(errno,
@@ -569,7 +574,7 @@ void signal_set_service::add_service(signal_set_service* service)
   signal_state* state = get_signal_state();
   static_mutex::scoped_lock lock(state->mutex_);
 
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__) && !defined(__vita__)
   // If this is the first service to be created, open a new pipe.
   if (state->service_list_ == 0)
     open_descriptors();
@@ -600,7 +605,8 @@ void signal_set_service::add_service(signal_set_service* service)
 
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
   // Register for pipe readiness notifications.
   int read_descriptor = state->read_descriptor_;
   lock.unlock();
@@ -626,7 +632,8 @@ void signal_set_service::remove_service(signal_set_service* service)
   {
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
     // Disable the pipe readiness notifications.
     int read_descriptor = state->read_descriptor_;
     lock.unlock();
@@ -655,7 +662,7 @@ void signal_set_service::remove_service(signal_set_service* service)
     service->next_ = 0;
     service->prev_ = 0;
 
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__) && !defined(__vita__)
     // If this is the last service to be removed, close the pipe.
     if (state->service_list_ == 0)
       close_descriptors();
@@ -667,7 +674,8 @@ void signal_set_service::open_descriptors()
 {
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
   signal_state* state = get_signal_state();
 
   int pipe_fds[2];
@@ -699,7 +707,8 @@ void signal_set_service::close_descriptors()
 {
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
   signal_state* state = get_signal_state();
 
   if (state->read_descriptor_ != -1)

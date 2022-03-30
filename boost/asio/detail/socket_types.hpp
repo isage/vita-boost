@@ -56,13 +56,18 @@
 # endif // !defined(BOOST_ASIO_NO_DEFAULT_LINKED_LIBS)
 # include <boost/asio/detail/old_win_sdk_compat.hpp>
 #else
+#if !defined(__vita__)
 # include <sys/ioctl.h>
-# if (defined(__MACH__) && defined(__APPLE__)) \
+#endif
+# if defined(__vita__)
+#  include <boost/asio/detail/vita_compat.hpp>
+# endif
+# if ((defined(__MACH__) && defined(__APPLE__)) \
    || defined(__FreeBSD__) || defined(__NetBSD__) \
    || defined(__OpenBSD__) || defined(__linux__) \
-   || defined(__EMSCRIPTEN__)
+   || defined(__EMSCRIPTEN__)) && !defined(__vita__)
 #  include <poll.h>
-# elif !defined(__SYMBIAN32__)
+# elif !defined(__SYMBIAN32__) && !defined(__vita__)
 #  include <sys/poll.h>
 # endif
 # include <sys/types.h>
@@ -75,15 +80,19 @@
 #  include <sys/select.h>
 # endif
 # include <sys/socket.h>
+#if !defined(__vita__)
 # include <sys/uio.h>
 # include <sys/un.h>
+#endif
 # include <netinet/in.h>
 # if !defined(__SYMBIAN32__)
 #  include <netinet/tcp.h>
 # endif
 # include <arpa/inet.h>
+#if !defined(__vita__)
 # include <netdb.h>
 # include <net/if.h>
+#endif
 # include <limits.h>
 # if defined(__sun)
 #  include <sys/filio.h>
@@ -291,11 +300,42 @@ typedef int socket_type;
 const int invalid_socket = -1;
 const int socket_error_retval = -1;
 const int max_addr_v4_str_len = INET_ADDRSTRLEN;
-#if defined(INET6_ADDRSTRLEN)
+#if defined(INET6_ADDRSTRLEN) && !defined(__vita__)
 const int max_addr_v6_str_len = INET6_ADDRSTRLEN + 1 + IF_NAMESIZE;
 #else // defined(INET6_ADDRSTRLEN)
 const int max_addr_v6_str_len = 256;
 #endif // defined(INET6_ADDRSTRLEN)
+#if defined(__vita__)
+typedef int ioctl_arg_type;
+typedef uint32_t u_long_type;
+typedef uint16_t u_short_type;
+struct in4_addr_type { u_long_type s_addr; };
+struct in4_mreq_type { in4_addr_type imr_multiaddr, imr_interface; };
+
+typedef in6_addr in6_addr_type;
+
+struct in6_mreq_type {
+    in6_addr_type ipv6mr_multiaddr;
+    unsigned long ipv6mr_interface;
+};
+
+typedef sockaddr socket_addr_type;
+typedef sockaddr_in sockaddr_in4_type;
+typedef sockaddr_in6 sockaddr_in6_type;
+
+struct sockaddr_storage_type {
+    int ss_family;
+    unsigned char ss_bytes[128 - sizeof(int)];
+};
+struct addrinfo_type {
+    int ai_flags;
+    int ai_family, ai_socktype, ai_protocol;
+    int ai_addrlen; void* ai_addr;
+    char* ai_canonname; addrinfo_type* ai_next;
+};
+struct linger_type { u_short_type l_onoff, l_linger; };
+struct sockaddr_un_type { u_short_type sun_family; char sun_path[108]; };
+#else
 typedef sockaddr socket_addr_type;
 typedef in_addr in4_addr_type;
 # if defined(__hpux)
@@ -319,6 +359,7 @@ typedef ::linger linger_type;
 typedef int ioctl_arg_type;
 typedef uint32_t u_long_type;
 typedef uint16_t u_short_type;
+#endif // defined(__vita__)
 #if defined(BOOST_ASIO_HAS_SSIZE_T)
 typedef ssize_t signed_size_type;
 #else // defined(BOOST_ASIO_HAS_SSIZE_T)
@@ -348,6 +389,9 @@ typedef int signed_size_type;
 # define BOOST_ASIO_OS_DEF_SHUT_RD SHUT_RD
 # define BOOST_ASIO_OS_DEF_SHUT_WR SHUT_WR
 # define BOOST_ASIO_OS_DEF_SHUT_RDWR SHUT_RDWR
+# if defined(__vita__)
+#  define SOMAXCONN 4096
+# endif
 # define BOOST_ASIO_OS_DEF_SOMAXCONN SOMAXCONN
 # define BOOST_ASIO_OS_DEF_SOL_SOCKET SOL_SOCKET
 # define BOOST_ASIO_OS_DEF_SO_BROADCAST SO_BROADCAST

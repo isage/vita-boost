@@ -72,8 +72,10 @@ public:
       message_out_of_band = BOOST_ASIO_OS_DEF(MSG_OOB));
   BOOST_ASIO_STATIC_CONSTANT(int,
       message_do_not_route = BOOST_ASIO_OS_DEF(MSG_DONTROUTE));
+#if !defined(__vita__)
   BOOST_ASIO_STATIC_CONSTANT(int,
       message_end_of_record = BOOST_ASIO_OS_DEF(MSG_EOR));
+#endif
 #endif
 
   /// Wait types.
@@ -155,8 +157,10 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined debug;
 #else
+#if !defined(__vita__)
   typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_DEBUG)> debug;
+#endif
 #endif
 
   /// Socket option to prevent routing, use local interfaces only.
@@ -188,9 +192,11 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined do_not_route;
 #else
+#if !defined(__vita__)
   typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_DONTROUTE)>
       do_not_route;
+#endif
 #endif
 
   /// Socket option to send keep-alives.
@@ -462,9 +468,11 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined out_of_band_inline;
 #else
+#if !defined(__vita__)
   typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_OOBINLINE)>
       out_of_band_inline;
+#endif
 #endif
 
   /// Socket option to report aborted connections on accept.

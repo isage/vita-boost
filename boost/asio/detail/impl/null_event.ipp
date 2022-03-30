@@ -17,7 +17,7 @@
 
 #include <boost/asio/detail/config.hpp>
 
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(BOOST_ASIO_WINDOWS_RUNTIME) || defined(__vita__)
 # include <thread>
 #elif defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 # include <boost/asio/detail/socket_types.hpp>
@@ -39,7 +39,7 @@ namespace detail {
 
 void null_event::do_wait()
 {
-#if defined(BOOST_ASIO_WINDOWS_RUNTIME)
+#if defined(BOOST_ASIO_WINDOWS_RUNTIME) || defined(__vita__)
   std::this_thread::sleep_until((std::chrono::steady_clock::time_point::max)());
 #elif defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
   ::Sleep(INFINITE);

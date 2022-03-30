@@ -34,7 +34,7 @@
 # include <boost/asio/detail/scheduler.hpp>
 #endif // defined(BOOST_ASIO_HAS_IOCP)
 
-#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__) && !defined(__vita__)
 # if defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
 #  include <boost/asio/detail/io_uring_service.hpp>
 # else // defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
@@ -201,7 +201,8 @@ private:
 
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(__vita__)
   // The type used for processing pipe readiness notifications.
   class pipe_read_op;
 

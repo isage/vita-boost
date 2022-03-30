@@ -38,34 +38,42 @@ public:
   posix_signal_blocker()
     : blocked_(false)
   {
+#if !defined(__vita__)
     sigset_t new_mask;
     sigfillset(&new_mask);
     blocked_ = (pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask_) == 0);
+#endif
   }
 
   // Destructor restores the previous signal mask.
   ~posix_signal_blocker()
   {
+#if !defined(__vita__)
     if (blocked_)
       pthread_sigmask(SIG_SETMASK, &old_mask_, 0);
+#endif
   }
 
   // Block all signals for the calling thread.
   void block()
   {
+#if !defined(__vita__)
     if (!blocked_)
     {
       sigset_t new_mask;
       sigfillset(&new_mask);
       blocked_ = (pthread_sigmask(SIG_BLOCK, &new_mask, &old_mask_) == 0);
     }
+#endif
   }
 
   // Restore the previous signal mask.
   void unblock()
   {
+#if !defined(__vita__)
     if (blocked_)
       blocked_ = (pthread_sigmask(SIG_SETMASK, &old_mask_, 0) != 0);
+#endif
   }
 
 private:
