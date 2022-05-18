@@ -53,7 +53,6 @@
 
 #if defined(__wasm)
 // WASI does not have statfs or statvfs.
-#elif defined(__vita__)
 #elif !defined(__APPLE__) && \
     (!defined(__OpenBSD__) || BOOST_OS_BSD_OPEN >= BOOST_VERSION_NUMBER(4, 4, 0)) && \
     !defined(__ANDROID__) && \
@@ -3312,19 +3311,6 @@ space_info space(path const& p, error_code* ec)
 
     emit_error(BOOST_ERROR_NOT_SUPPORTED, p, ec, "boost::filesystem::space");
 
-#elif defined(__vita__)
-
-    SceIoDevInfo devinfo;
-    memset(&devinfo, 0, sizeof(SceIoDevInfo));
-    int res = sceIoDevctl(p.c_str(), 0x3001, NULL, 0, &devinfo, sizeof(SceIoDevInfo));
-
-    if (!error(res < 0 ? BOOST_ERRNO : 0,
-      p, ec, "boost::filesystem::space"))
-    {
-      info.capacity = static_cast<boost::uintmax_t>(devinfo.max_size);
-      info.free = static_cast<boost::uintmax_t>(devinfo.free_size);
-      info.available = static_cast<boost::uintmax_t>(devinfo.max_size - devinfo.free_size);
-    }
 #elif defined(BOOST_POSIX_API)
 
     struct BOOST_STATVFS vfs;
