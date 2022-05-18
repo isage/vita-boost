@@ -9,7 +9,7 @@
 // knows that we are building the library (possibly exporting code), rather
 // than using it (possibly importing code).
 #define BOOST_IOSTREAMS_SOURCE
-
+#if !defined(__vita__)
 #include <cassert>
 #include <stdexcept>
 #include <boost/iostreams/detail/config/rtl.hpp>
@@ -497,3 +497,4 @@ mapped_file_sink::mapped_file_sink(const mapped_file_sink& other)
 //----------------------------------------------------------------------------//
 
 } } // End namespaces iostreams, boost.
+#endif // defined(__vita__)
