@@ -89,8 +89,8 @@
 #  include <netinet/tcp.h>
 # endif
 # include <arpa/inet.h>
-#if !defined(__vita__)
 # include <netdb.h>
+#if !defined(__vita__)
 # include <net/if.h>
 #endif
 # include <limits.h>

@@ -45,8 +45,6 @@
 typedef int SceNetId;
 # include <netinet/in.h>
 # include <sys/param.h>
-#define NI_MAXHOST      1025
-#define NI_MAXSERV      32
 #endif
 
 #include <boost/asio/detail/push_options.hpp>
@@ -2908,17 +2906,6 @@ inline boost::system::error_code translate_netdb_error(int error)
   }
 }
 
-#if defined(__vita__)
-struct hostent
-{
-    char *h_name;
-    char **h_aliases;
-    int h_addrtype;
-    int h_length;
-    char **h_addr_list;
-    char *h_addr;
-};
-#endif
 
 inline hostent* gethostbyaddr(const char* addr, int length, int af,
     hostent* result, char* buffer, int buflength, boost::system::error_code& ec)
