@@ -828,7 +828,7 @@ public:
     bool is_absolute() const
     {
         // Windows CE has no root name (aka drive letters)
-#if defined(BOOST_WINDOWS_API) && !defined(UNDER_CE)
+#if (defined(BOOST_WINDOWS_API) && !defined(UNDER_CE)) || defined(__vita__)
         return has_root_name() && has_root_directory();
 #else
         return has_root_directory();
@@ -1221,6 +1221,9 @@ inline bool is_element_separator(path::value_type c) BOOST_NOEXCEPT
     return c == path::separator
 #ifdef BOOST_WINDOWS_API
         || c == path::preferred_separator || c == L':'
+#endif
+#ifdef __vita__
+        || c == ':'
 #endif
         ;
 }
